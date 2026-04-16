@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 🔥 Angular CDK Drag & Drop Fix */
+.cdk-drag-preview {
+  transition: none !important;
+}
+
+.cdk-drag-animating {
+  transition: none !important;
+}
+
+.cdk-drop-list-dragging .cdk-drag {
+  transition: none !important;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

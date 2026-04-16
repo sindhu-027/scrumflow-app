@@ -1,0 +1,178 @@
+<!-- NAVBAR -->
+<nav class="bg-gray-900 text-white px-6 py-3 flex items-center justify-between shadow-md">
+
+  <!-- LEFT: LOGO -->
+  <div class="flex items-center gap-2">
+    <img [src]="logo" alt="ScrumFlow Logo" class="h-10 w-10">
+    <span class="text-lg font-semibold text-cyan-400">ScrumFlow</span>
+  </div>
+
+  <!-- CENTER: NAV -->
+  <div class="flex gap-6 items-center">
+
+    <a routerLink="/dashboard" routerLinkActive="text-cyan-400" class="hover:text-cyan-400">
+      Dashboard
+    </a>
+
+    <a routerLink="/board" routerLinkActive="text-cyan-400" class="hover:text-cyan-400">
+      Board
+    </a>
+
+    <a routerLink="/backlog" routerLinkActive="text-cyan-400" class="hover:text-cyan-400">
+      Backlog
+    </a>
+
+    <a routerLink="/my-tasks" routerLinkActive="text-cyan-400"
+       class="hover:text-cyan-400 font-semibold">
+      My Tasks
+    </a>
+
+    <a *ngIf="role==='Admin'" routerLink="/manage-users"
+       class="hover:text-cyan-400">
+      Users
+    </a>
+
+    <a *ngIf="role==='ScrumMaster'" routerLink="/sprint-management"
+       class="hover:text-cyan-400">
+      Sprints
+    </a>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="flex items-center gap-4">
+
+    <a routerLink="/create-task"
+       class="bg-cyan-500 px-3 py-1 rounded hover:bg-cyan-600 text-sm">
+      + Task
+    </a>
+
+    <button (click)="logout()"
+       class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-sm">
+      Logout
+    </button>
+
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="p-6 bg-gray-100 min-h-screen">
+
+  <h1 class="text-3xl font-bold mb-6">My Tasks</h1>
+
+  <!-- LOADING -->
+  <div *ngIf="isLoading" class="text-gray-500 mb-4">
+    Loading tasks...
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <!-- ================= TO DO ================= -->
+    <div
+      id="todoList"
+      cdkDropList
+      [cdkDropListData]="todoTasks"
+      [cdkDropListConnectedTo]="['inProgressList','completedList']"
+      (cdkDropListDropped)="drop($event, 'To Do')"
+      class="bg-white rounded-xl shadow p-4 min-h-[400px]"
+    >
+
+      <h2 class="font-semibold mb-4">To Do</h2>
+
+      <div *ngIf="todoTasks.length === 0" class="text-gray-400 text-sm">
+        No tasks
+      </div>
+
+      <div *ngFor="let task of todoTasks"
+           cdkDrag
+           [cdkDragData]="task"
+           class="bg-gray-50 p-3 rounded mb-3 shadow cursor-move">
+
+        <h3 class="font-semibold">{{ task.title }}</h3>
+        <p class="text-sm text-gray-600">{{ task.description }}</p>
+
+        <p class="text-xs mt-2 text-gray-500">
+          Sprint: {{ getSprintName(task) }}
+        </p>
+
+        <div class="mt-2">
+          <button (click)="viewTask(task)"
+            class="bg-blue-500 text-white px-2 py-1 rounded text-sm">
+            View
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= IN PROGRESS ================= -->
+    <div
+      id="inProgressList"
+      cdkDropList
+      [cdkDropListData]="inProgressTasks"
+      [cdkDropListConnectedTo]="['todoList','completedList']"
+      (cdkDropListDropped)="drop($event, 'In Progress')"
+      class="bg-white rounded-xl shadow p-4 min-h-[400px]"
+    >
+
+      <h2 class="font-semibold mb-4">In Progress</h2>
+
+      <div *ngIf="inProgressTasks.length === 0" class="text-gray-400 text-sm">
+        No tasks
+      </div>
+
+      <div *ngFor="let task of inProgressTasks"
+           cdkDrag
+           [cdkDragData]="task"
+           class="bg-yellow-50 p-3 rounded mb-3 shadow cursor-move">
+
+        <h3 class="font-semibold">{{ task.title }}</h3>
+        <p class="text-sm text-gray-600">{{ task.description }}</p>
+
+        <p class="text-xs mt-2 text-gray-500">
+          Sprint: {{ getSprintName(task) }}
+        </p>
+
+        <div class="mt-2">
+          <button (click)="viewTask(task)"
+            class="bg-blue-500 text-white px-2 py-1 rounded text-sm">
+            View
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= COMPLETED ================= -->
+    <div
+      id="completedList"
+      cdkDropList
+      [cdkDropListData]="completedTasks"
+      [cdkDropListConnectedTo]="['todoList','inProgressList']"
+      (cdkDropListDropped)="drop($event, 'Completed')"
+      class="bg-white rounded-xl shadow p-4 min-h-[400px]"
+    >
+
+      <h2 class="font-semibold mb-4">Completed</h2>
+
+      <div *ngIf="completedTasks.length === 0" class="text-gray-400 text-sm">
+        No tasks
+      </div>
+
+      <div *ngFor="let task of completedTasks"
+           cdkDrag
+           [cdkDragData]="task"
+           class="bg-green-50 p-3 rounded mb-3 shadow opacity-80 cursor-move">
+
+        <h3 class="font-semibold line-through">{{ task.title }}</h3>
+        <p class="text-sm text-gray-500">{{ task.description }}</p>
+
+        <div class="mt-2">
+          <button (click)="viewTask(task)"
+            class="bg-blue-400 text-white px-2 py-1 rounded text-sm">
+            View
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

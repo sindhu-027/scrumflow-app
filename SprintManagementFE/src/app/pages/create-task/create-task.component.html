@@ -1,0 +1,115 @@
+
+<!-- NAVBAR -->
+<nav class="bg-gray-900 text-white px-6 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-2">
+    <img [src]="logo" class="h-10 w-10">
+    <span class="text-lg font-semibold">ScrumFlow</span>
+  </div>
+
+  <div class="flex gap-4">
+    <a routerLink="/dashboard" class="hover:text-cyan-400">Dashboard</a>
+    <a routerLink="/backlog" class="hover:text-cyan-400">Backlog</a>
+  </div>
+</nav>
+
+<!-- 🔐 ROLE RESTRICTION WRAPPER -->
+<div *ngIf="role === 'ProductOwner' || role === 'Admin'; else noAccess"
+     class="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-xl mt-6">
+
+  <h1 class="text-2xl font-bold mb-6">Create Task</h1>
+
+  <form (ngSubmit)="createTask()" #taskForm="ngForm" class="space-y-4">
+
+    <!-- Sprint -->
+    <div>
+      <label class="block mb-1 font-medium">Sprint</label>
+      <select [(ngModel)]="selectedSprintId" name="sprintId" required
+        class="w-full px-3 py-2 border rounded">
+        <option value="" disabled>Select Sprint</option>
+        <option *ngFor="let sprint of sprints" [value]="sprint.id">
+          {{ sprint.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Assign -->
+    <div>
+      <label class="block mb-1 font-medium">Assign To</label>
+      <select [(ngModel)]="selectedUserId" name="assigneeId" required
+        class="w-full px-3 py-2 border rounded">
+        <option value="" disabled>Select User</option>
+        <option *ngFor="let user of users" [value]="user.id">
+          {{ user.name }} ({{ user.role }})
+        </option>
+      </select>
+    </div>
+
+    <!-- Title -->
+    <div>
+      <label class="block mb-1 font-medium">Title</label>
+      <input type="text" [(ngModel)]="task.title" name="title" required
+        class="w-full px-3 py-2 border rounded">
+    </div>
+
+    <!-- Story -->
+    <div>
+      <label class="block mb-1 font-medium">Story Name</label>
+      <input type="text" [(ngModel)]="task.storyName" name="storyName" required
+        class="w-full px-3 py-2 border rounded">
+    </div>
+
+    <!-- Points -->
+    <div>
+      <label class="block mb-1 font-medium">Story Points</label>
+      <input type="number" [(ngModel)]="task.storyPoints" name="storyPoints"
+        min="1" max="5" required class="w-full px-3 py-2 border rounded">
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label class="block mb-1 font-medium">Description</label>
+      <textarea [(ngModel)]="task.description" name="description" rows="4"
+        class="w-full px-3 py-2 border rounded"></textarea>
+    </div>
+
+    <!-- Priority -->
+    <div>
+      <label class="block mb-1 font-medium">Priority</label>
+      <select [(ngModel)]="task.priority" name="priority" required
+        class="w-full px-3 py-2 border rounded">
+        <option value="">Select Priority</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+    </div>
+
+    <!-- Status -->
+    <div>
+      <label class="block mb-1 font-medium">Status</label>
+      <select [(ngModel)]="task.status" name="status"
+        class="w-full px-3 py-2 border rounded">
+        <option value="To Do">To Do</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+      </select>
+    </div>
+
+    <!-- BUTTON -->
+    <button 
+      type="submit"
+      [disabled]="!taskForm.form.valid"
+      class="w-full py-3 bg-cyan-500 text-white rounded hover:bg-cyan-600 disabled:opacity-50">
+
+      Create Task
+    </button>
+
+  </form>
+</div>
+
+<!-- ❌ NO ACCESS MESSAGE -->
+<ng-template #noAccess>
+  <div class="text-center mt-10 text-red-500 text-lg font-semibold">
+    You are not allowed to access this page
+  </div>
+</ng-template>

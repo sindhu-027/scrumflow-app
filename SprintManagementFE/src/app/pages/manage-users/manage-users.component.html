@@ -1,0 +1,131 @@
+
+
+
+
+
+
+<!-- 🔥 NAVBAR -->
+<nav class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow">
+
+  <!-- LOGO -->
+  <div class="flex items-center gap-2">
+    <img [src]="logo" alt="ScrumFlow Logo" class="h-10 w-10">
+    <span class="text-cyan-400 font-bold text-lg">ScrumFlow</span>
+  </div>
+
+  <!-- MENU -->
+  <div class="flex gap-6 text-sm font-medium">
+    <a routerLink="/dashboard" class="hover:text-cyan-400 transition">Dashboard</a>
+
+    <a *ngIf="role === 'ProductOwner'" routerLink="/manage-users"
+       class="text-cyan-400 font-semibold">
+      Users
+    </a>
+  </div>
+
+</nav>
+
+<!-- ACCESS DENIED -->
+<div *ngIf="role !== 'ProductOwner'" class="p-10 text-center text-red-500 font-semibold">
+  🚫 You are not authorized to access this page
+</div>
+
+<!-- PAGE CONTENT -->
+<div *ngIf="role === 'ProductOwner'" class="p-6 max-w-6xl mx-auto">
+
+  <h1 class="text-3xl font-bold mb-6 text-gray-800">User Management</h1>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="users.length === 0" class="text-gray-500">
+    No users found.
+  </div>
+
+  <!-- TABLE -->
+  <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
+
+    <table class="w-full text-sm">
+
+      <!-- HEADER -->
+      <thead class="bg-gray-100 text-gray-700">
+        <tr>
+          <th class="p-4 text-left">Name</th>
+          <th class="p-4 text-left">Email</th>
+          <th class="p-4 text-left">Role</th>
+          <th class="p-4 text-center">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let user of users" class="border-b hover:bg-gray-50 transition">
+
+          <!-- NAME -->
+          <td class="p-4 font-medium">
+            {{ user.name }}
+          </td>
+
+          <!-- EMAIL -->
+          <td class="p-4 text-gray-600">
+            {{ user.email }}
+          </td>
+
+          <!-- ROLE BADGE + EDIT -->
+          <td class="p-4">
+
+            <!-- ROLE DISPLAY -->
+            <span *ngIf="!user.editMode"
+                  class="px-3 py-1 rounded-full text-xs font-semibold"
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-700': user.role === 'Developer',
+                    'bg-green-100 text-green-700': user.role === 'ScrumMaster',
+                    'bg-purple-100 text-purple-700': user.role === 'ProductOwner'
+                  }">
+              {{ user.role }}
+            </span>
+
+            <!-- ROLE EDIT DROPDOWN -->
+            <select *ngIf="user.editMode"
+                    [(ngModel)]="user.role"
+                    class="border rounded px-2 py-1 mt-1 w-full focus:ring-2 focus:ring-cyan-400">
+
+              <option *ngFor="let r of roles" [value]="r">
+                {{ r }}
+              </option>
+
+            </select>
+
+          </td>
+
+          <!-- ACTIONS -->
+          <td class="p-4 text-center flex justify-center gap-2">
+
+            <!-- EDIT -->
+            <button *ngIf="!user.editMode"
+                    (click)="user.editMode = true"
+                    class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+              Edit
+            </button>
+
+            <!-- SAVE -->
+            <button *ngIf="user.editMode"
+                    (click)="assignRole(user); user.editMode = false"
+                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+              Assing
+            </button>
+
+            <!-- CANCEL -->
+            <button *ngIf="user.editMode"
+                    (click)="user.editMode = false"
+                    class="text-gray-500 hover:text-gray-700 text-sm">
+              Cancel
+            </button>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+  </div>
+</div>

@@ -1,0 +1,111 @@
+<!-- NAVBAR -->
+<nav class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow">
+  <div class="flex items-center gap-2">
+    <img [src]="logo" class="h-10 w-10">
+    <span class="text-lg font-semibold text-cyan-400">ScrumFlow</span>
+  </div>
+
+  <div class="flex gap-6 text-sm font-medium">
+    <a routerLink="/dashboard" class="hover:text-cyan-400">Dashboard</a>
+    <a routerLink="/board" class="hover:text-cyan-400">Board</a>
+    <a routerLink="/my-tasks" class="hover:text-cyan-400">My Tasks</a>
+
+    <a *ngIf="role==='Admin'" routerLink="/manage-users" class="hover:text-cyan-400">Users</a>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="p-6 bg-gray-100 min-h-screen">
+
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Product Backlog</h1>
+
+    <a *ngIf="role==='ProductOwner' || role==='Admin'"
+      routerLink="/create-task"
+      class="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition">
+      + Add Task
+    </a>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="tasks.length === 0" class="text-gray-500 text-lg">
+    No backlog items available.
+  </div>
+
+  <!-- TASK TABLE -->
+  <div *ngIf="tasks.length > 0" class="bg-white shadow rounded-xl overflow-hidden">
+
+    <table class="w-full text-sm">
+      <thead class="bg-gray-200 text-gray-700">
+        <tr>
+          <th class="p-3 text-left">Title</th>
+          <th class="p-3 text-left">Priority</th>
+          <th class="p-3 text-left">Story Points</th>
+          <th class="p-3 text-center">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let task of tasks" class="border-b hover:bg-gray-50">
+
+          <td class="p-3 font-medium text-gray-800">
+            {{ task.title }}
+          </td>
+
+          <td class="p-3">
+            <span
+              [ngClass]="{
+                'text-red-600 font-semibold': task.priority==='High',
+                'text-yellow-600 font-semibold': task.priority==='Medium',
+                'text-green-600 font-semibold': task.priority==='Low'
+              }">
+              {{ task.priority }}
+            </span>
+          </td>
+
+          <td class="p-3">{{ task.storyPoints }}</td>
+
+          <!-- ACTIONS -->
+          <td class="p-3">
+            <div class="flex justify-center gap-4">
+
+              <!-- VIEW (ICON) -->
+              <button (click)="viewTask(task)"
+                class="text-blue-600 hover:text-blue-800 text-xl"
+                title="View Task">
+                <span class="material-icons">visibility</span>
+              </button>
+
+              <!-- EDIT (ICON) -->
+              <button *ngIf="role==='ProductOwner' || role==='Admin'"
+              (click)="editTask(task)"
+                class="text-yellow-600 hover:text-yellow-800 text-xl"
+                title="Edit Task">
+                <span class="material-icons">edit</span>
+              </button>
+
+            </div>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

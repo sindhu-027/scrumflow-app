@@ -1,0 +1,13 @@
+# Backend
+**/bin/
+**/obj/
+*.user
+*.log
+appsettings.Development.json
+.vs/
+
+# Frontend
+SprintManagementFE/node_modules/
+SprintManagementFE/dist/
+SprintManagementFE/.angular/
+.env

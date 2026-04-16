@@ -1,0 +1,165 @@
+<div class="min-h-screen bg-gray-100">
+
+  <!-- NAVBAR -->
+  <nav class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      <img src="assets/ScrumLogo.png" class="h-10 w-10">
+      <span class="font-bold text-lg text-cyan-400">ScrumFlow</span>
+    </div>
+
+    <div class="flex gap-6 text-sm font-medium">
+      <a routerLink="/dashboard" class="hover:text-cyan-400">Dashboard</a>
+      <a routerLink="/board" class="hover:text-cyan-400">Board</a>
+      <a routerLink="/my-tasks" class="hover:text-cyan-400">My Tasks</a>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto py-8 px-4">
+
+    <h1 class="text-3xl font-bold mb-6">Sprint Management</h1>
+
+    <!-- ERROR -->
+    <div *ngIf="errorMsg" class="bg-red-100 text-red-600 p-3 mb-4 rounded">
+      {{ errorMsg }}
+    </div>
+
+    <!-- SUCCESS -->
+    <div *ngIf="successMsg" class="bg-green-100 text-green-600 p-3 mb-4 rounded">
+      {{ successMsg }}
+    </div>
+
+    <!-- CREATE SPRINT -->
+    <div class="bg-white p-6 rounded-xl shadow mb-8">
+      <h2 class="text-xl font-semibold mb-4">Create Sprint</h2>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <input [(ngModel)]="newSprintName" placeholder="Sprint Name"
+          class="border px-4 py-2 rounded w-full" />
+
+        <textarea [(ngModel)]="newSprintDescription"
+          placeholder="Description"
+          class="border px-4 py-2 rounded w-full"></textarea>
+
+        <input type="date" [(ngModel)]="newSprintStart"
+          class="border px-4 py-2 rounded w-full" />
+
+        <input type="date" [(ngModel)]="newSprintEnd"
+          class="border px-4 py-2 rounded w-full" />
+      </div>
+
+      <button (click)="createSprint()"
+        class="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+        Create Sprint
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="text-center text-gray-600">
+      Loading sprints...
+    </div>
+
+    <!-- EMPTY -->
+    <div *ngIf="!loading && sprints.length === 0"
+         class="text-center text-gray-500">
+      No sprints created yet
+    </div>
+
+    <!-- TABLE -->
+    <div *ngIf="!loading && sprints.length > 0"
+         class="bg-white p-6 rounded-xl shadow">
+
+      <h2 class="text-xl font-semibold mb-4">Existing Sprints</h2>
+
+      <table class="w-full border text-sm">
+        <thead class="bg-gray-200 text-gray-700">
+          <tr>
+            <th class="p-3 border text-left">Name</th>
+            <th class="p-3 border text-center">Start</th>
+            <th class="p-3 border text-center">End</th>
+            <th class="p-3 border text-center">Status</th>
+            <th class="p-3 border text-center">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let sprint of sprints" class="hover:bg-gray-50">
+
+            <!-- NAME + VIEW -->
+            <td class="p-3 border font-medium flex items-center gap-2">
+
+              <span>{{ sprint.name }}</span>
+
+              <button
+                [routerLink]="['/task-details', sprint.id]"
+                class="text-blue-600 hover:text-blue-800 text-lg"
+                title="View Sprint">
+
+                <span class="material-icons">visibility</span>
+              </button>
+
+            </td>
+
+            <!-- START -->
+            <td class="p-3 border text-center">
+              {{ sprint.startDate | date:'mediumDate' }}
+            </td>
+
+            <!-- END -->
+            <td class="p-3 border text-center">
+              {{ sprint.endDate | date:'mediumDate' }}
+            </td>
+
+            <!-- STATUS -->
+            <td class="p-3 border text-center">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                [ngClass]="{
+                  'bg-gray-200 text-gray-700': sprint.status==='Planned',
+                  'bg-green-200 text-green-800': sprint.status==='Active',
+                  'bg-red-200 text-red-800': sprint.status==='Completed'
+                }">
+                {{ sprint.status }}
+              </span>
+            </td>
+
+            <!-- ACTIONS -->
+            <td class="p-3 border">
+              <div class="flex justify-center gap-3 items-center">
+
+                <!-- START -->
+                <button
+                  (click)="startSprint(sprint)"
+                  [disabled]="sprint.status !== 'Planned' || isActiveSprint()"
+                  class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 disabled:opacity-40">
+
+                  Start
+                </button>
+
+                <!-- END -->
+                <button
+                  (click)="endSprint(sprint)"
+                  [disabled]="sprint.status !== 'Active'"
+                  class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 disabled:opacity-40">
+
+                  End
+                </button>
+
+                <!-- DELETE -->
+                <button
+                  (click)="deleteSprint(sprint.id)"
+                  class="text-red-600 hover:text-red-800 text-xl"
+                  title="Delete Sprint">
+
+                  <span class="material-icons">delete</span>
+                </button>
+
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>

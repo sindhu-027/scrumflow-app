@@ -1,0 +1,211 @@
+<div class="min-h-screen bg-gray-100">
+
+  <!-- NAVBAR -->
+  <nav class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow">
+    <div class="flex items-center gap-2">
+      <img [src]="logo" class="h-10 w-10">
+      <span class="text-cyan-400 font-bold text-lg">ScrumFlow</span>
+    </div>
+
+    <div class="flex items-center gap-6 text-sm">
+      <a routerLink="/dashboard">Dashboard</a>
+      <a routerLink="/board">Board</a>
+
+      <a *ngIf="role==='Developer'" routerLink="/my-tasks">My Tasks</a>
+      <a *ngIf="role==='ProductOwner'" routerLink="/backlog">Backlog</a>
+      <a *ngIf="role==='ScrumMaster'" routerLink="/sprint-management">Sprint</a>
+
+      <button (click)="logout()" class="bg-red-500 px-3 py-1 rounded-lg">
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <div class="p-6 max-w-6xl mx-auto">
+
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
+
+    <!-- ================= PRODUCT OWNER ================= -->
+    <div *ngIf="role==='ProductOwner'" class="space-y-6">
+
+      <h2 class="text-xl font-semibold text-blue-600">Product Owner Panel</h2>
+
+      <div class="grid md:grid-cols-4 gap-4">
+
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+          <p class="text-sm text-gray-500">Backlog</p>
+          <p class="text-2xl font-bold">{{ backlog }}</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow text-red-500 text-center">
+          <p class="text-sm">High Priority</p>
+          <p class="text-2xl font-bold">{{ highPriority }}</p>
+        </div>
+
+        <!-- ✅ FIXED COMPLETED -->
+        <div class="bg-white p-4 rounded-xl shadow text-green-600 text-center">
+          <p class="text-sm">Completed</p>
+          <p class="text-2xl font-bold">{{ completed }}</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+          <p class="text-sm">Health</p>
+          <p class="text-xl font-bold"
+            [ngClass]="highPriority > backlog/2 ? 'text-red-500' : 'text-green-500'">
+            {{ highPriority > backlog/2 ? '⚠ Risk' : '✔ Healthy' }}
+          </p>
+        </div>
+
+      </div>
+
+      <!-- ✅ CREATE TASK BUTTON -->
+      <div class="flex justify-center">
+        <button routerLink="/create-task"
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+          + Create Task
+        </button>
+      </div>
+
+      <!-- CHART -->
+      <div class="flex justify-center">
+        <div class="bg-white p-4 rounded-xl shadow w-[300px] h-[220px]">
+          <canvas id="priorityChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= SCRUM MASTER ================= -->
+    <div *ngIf="role==='ScrumMaster'" class="space-y-6 mt-8">
+
+      <h2 class="text-xl font-semibold text-green-600">Scrum Master Panel</h2>
+
+      <!-- SPRINT SELECT -->
+      <div class="flex justify-center">
+        <select [(ngModel)]="selectedSprintId"
+          (change)="onSprintChange()"
+          class="border px-4 py-2 rounded shadow">
+          <option *ngFor="let sprint of allSprints" [ngValue]="sprint.id">
+            {{ sprint.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- CARDS -->
+      <div class="grid md:grid-cols-3 gap-4">
+
+        <!-- ✅ STATUS FIX -->
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+          <p class="text-sm">Sprint</p>
+          <p class="font-bold text-lg">{{ activeSprint }}</p>
+
+          <p class="text-xs mt-1"
+            [ngClass]="sprintCompleted === sprintTotal && sprintTotal > 0 
+              ? 'text-blue-500' 
+              : 'text-green-500'">
+
+            {{ sprintCompleted === sprintTotal && sprintTotal > 0
+              ? 'Completed'
+              : 'Running' }}
+          </p>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+          <p class="text-sm">Progress</p>
+          <p class="font-bold text-lg">
+            {{ sprintTotal > 0 ? (sprintCompleted / sprintTotal * 100 | number:'1.0-0') : 0 }}%
+          </p>
+        </div>
+
+        <!-- TASK COUNT -->
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+          <p class="text-sm">Sprint Tasks</p>
+          <p class="font-bold text-lg">{{ sprintTotal }}</p>
+        </div>
+
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="flex justify-center gap-4">
+
+        <button (click)="startSprint()"
+          [disabled]="activeSprint !== 'No Active Sprint'"
+          class="px-5 py-2 rounded text-white"
+          [ngClass]="activeSprint === 'No Active Sprint'
+            ? 'bg-green-500'
+            : 'bg-gray-400 cursor-not-allowed'">
+          Start Sprint
+        </button>
+
+        <!-- ✅ DISABLE WHEN 100% -->
+        <button (click)="endSprint()"
+          [disabled]="sprintCompleted === sprintTotal || sprintTotal === 0"
+          class="px-5 py-2 rounded text-white"
+          [ngClass]="sprintCompleted === sprintTotal
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-red-500'">
+          End Sprint
+        </button>
+
+      </div>
+
+      <!-- BURNDOWN -->
+      <div class="flex justify-center">
+        <div class="bg-white p-4 rounded-xl shadow w-[420px] h-[250px]">
+          <canvas id="burndownChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= DEVELOPER ================= -->
+    <div *ngIf="role==='Developer'" class="space-y-6 mt-8">
+
+      <h2 class="text-xl font-semibold text-purple-600">Developer Panel</h2>
+
+      <div class="grid md:grid-cols-4 gap-4">
+
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+          <p class="text-sm">My Tasks</p>
+          <p class="text-2xl font-bold">{{ myTasks }}</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow text-yellow-500 text-center">
+          <p class="text-sm">In Progress</p>
+          <p class="text-2xl font-bold">{{ inProgress }}</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow text-green-600 text-center">
+          <p class="text-sm">Completed</p>
+          <p class="text-2xl font-bold">{{ completed }}</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow text-purple-600 text-center">
+          <p class="text-sm">Productivity</p>
+          <p class="text-2xl font-bold">
+            {{ myTasks > 0 ? (completed / myTasks * 100 | number:'1.0-0') : 0 }}%
+          </p>
+        </div>
+
+      </div>
+
+      <!-- ✅ VIEW MY TASK BUTTON -->
+      <div class="flex justify-center">
+        <button routerLink="/my-tasks"
+          class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+          View My Tasks
+        </button>
+      </div>
+
+      <!-- CHART -->
+      <div class="flex justify-center">
+        <div class="bg-white p-4 rounded-xl shadow w-[280px] h-[220px]">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
