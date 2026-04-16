@@ -16,7 +16,7 @@ builder.Services.AddControllers()
 
 // ===================== DATABASE =====================
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ===================== SERVICES =====================
 builder.Services.AddScoped<AuthService>();
