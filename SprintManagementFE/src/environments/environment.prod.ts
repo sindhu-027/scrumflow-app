@@ -1,4 +1,5 @@
+
 export const environment = {
   production: true,
-  apiUrl: 'https://YOUR-BACKEND-URL/api'
+  apiUrl: 'https://scrumflow-app-production.up.railway.app/api'
 };
