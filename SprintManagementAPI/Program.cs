@@ -2,21 +2,29 @@ using Microsoft.EntityFrameworkCore;
 using SprintManagementAPI.Data;
 using SprintManagementAPI.Services;
 using SprintManagementAPI.Middlewares;
-using System.Text.Json.Serialization; // <-- add this
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ===================== ENVIRONMENT =====================
+var env = builder.Environment.EnvironmentName;
 
 // ===================== CONTROLLERS =====================
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // Ignore reference cycles to prevent JSON serialization errors
+        // Prevent circular reference issues
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
 // ===================== DATABASE =====================
+// Get connection string from appsettings.json / Development / Production
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseNpgsql(connectionString);
+});
 
 // ===================== SERVICES =====================
 builder.Services.AddScoped<AuthService>();
@@ -31,7 +39,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins(allowedOrigins!)
+        policy.WithOrigins(allowedOrigins ?? Array.Empty<string>())
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -40,22 +48,32 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// ===================== AUTO MIGRATION =====================
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+
+    try
+    {
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Database migration failed: " + ex.Message);
+    }
 }
 
 // ===================== MIDDLEWARE =====================
 app.UseHttpsRedirection();
+
 app.UseCors("AllowAngular");
 
-// 🔥 Use AuthMiddleware globally
+// Custom auth middleware
 app.UseAuthMiddleware();
 
 app.UseAuthorization();
 
-// ===================== ENDPOINTS =====================
+// ===================== CONTROLLERS =====================
 app.MapControllers();
 
 app.Run();
