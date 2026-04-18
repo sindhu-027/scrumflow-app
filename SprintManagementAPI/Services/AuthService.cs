@@ -99,6 +99,11 @@
 
 
 
+//-----------------------------------------
+
+
+
+
 using SprintManagementAPI.Models;
 using SprintManagementAPI.Data;
 using Microsoft.EntityFrameworkCore;
@@ -120,18 +125,21 @@ namespace SprintManagementAPI.Services
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
                 return null;
 
-            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            email = email.Trim().ToLower();
+            password = password.Trim();
+
+            var user = _context.Users
+                .FirstOrDefault(u => u.Email.ToLower() == email);
 
             if (user == null)
                 return null;
 
-            // verify password
             bool isValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
 
             if (!isValid)
                 return null;
 
-            // generate session token
+            // 🔥 regenerate session token
             user.SessionToken = Guid.NewGuid().ToString();
 
             _context.SaveChanges();
@@ -147,15 +155,17 @@ namespace SprintManagementAPI.Services
                 string.IsNullOrWhiteSpace(password))
                 return null;
 
+            name = name.Trim();
             email = email.Trim().ToLower();
+            password = password.Trim();
 
-            // prevent duplicate email
-            if (_context.Users.Any(u => u.Email == email))
+            // 🔥 prevent duplicate (case-insensitive)
+            if (_context.Users.Any(u => u.Email.ToLower() == email))
                 return null;
 
             var user = new User
             {
-                Name = name.Trim(),
+                Name = name,
                 Email = email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
                 Role = "Developer",
