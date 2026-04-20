@@ -87,12 +87,25 @@ namespace SprintManagementAPI.Utils
             return request.Cookies.TryGetValue(key, out var value) ? value : null;
         }
 
+        // public static void DeleteCookie(HttpResponse response, string key)
+        // {
+        //     if (response == null) throw new ArgumentNullException(nameof(response));
+        //     if (string.IsNullOrEmpty(key)) return;
+
+        //     response.Cookies.Delete(key);
+        // }
+
         public static void DeleteCookie(HttpResponse response, string key)
         {
             if (response == null) throw new ArgumentNullException(nameof(response));
             if (string.IsNullOrEmpty(key)) return;
 
-            response.Cookies.Delete(key);
+            response.Cookies.Delete(key, new CookieOptions
+            {
+                Secure = true,
+                SameSite = SameSiteMode.None
+            });
         }
+
     }
 }
