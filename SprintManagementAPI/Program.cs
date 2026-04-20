@@ -54,7 +54,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:4200",
-                "https://scrumflow-app.onrender.com"
+                "https://scrumflowapp.onrender.com"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()
