@@ -34,10 +34,10 @@ export class SprintManagementComponent implements OnInit {
   ngOnInit(): void {
     this.loadSprints();
 
-    this.auth.getCurrentUser().subscribe({
-      next: (res: any) => this.role = res.role,
-      error: () => alert('Session expired. Please login again.')
-    });
+    // this.auth.getCurrentUser().subscribe({
+    //   next: (res: any) => this.role = res.role,
+    //   error: () => alert('Session expired. Please login again.')
+    // });
   }
 
   // ================= LOAD =================
