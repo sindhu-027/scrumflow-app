@@ -5,7 +5,6 @@ using SprintManagementAPI.Data;
 using SprintManagementAPI.Services;
 using SprintManagementAPI.Middlewares;
 using System.Text.Json.Serialization;
-using System.Linq; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +15,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-// ===================== DATABASE (RAILWAY FINAL FIX) =====================
+// ===================== DATABASE =====================
 var databaseUrl = builder.Configuration["DATABASE_URL"];
 
 string connectionString;
@@ -63,14 +62,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ===================== BUILD APP =====================
+// ===================== BUILD =====================
 var app = builder.Build();
 
 // ===================== AUTO MIGRATION =====================
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
     try
     {
         db.Database.Migrate();
@@ -81,32 +79,22 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ===================== MIDDLEWARE (FINAL FIX) =====================
-
-//  Routing 
-app.UseRouting();
-
-// CORS
-app.UseCors("AllowAngular");
-
+// ===================== MIDDLEWARE =====================
 
 app.UseHttpsRedirection();
 
-//  Your custom middleware
+app.UseRouting();
+
+// 🔥 VERY IMPORTANT → CORS must be here
+app.UseCors("AllowAngular");
+
 app.UseAuthMiddleware();
 
 app.UseAuthorization();
 
-//  HANDLE PREFLIGHT (CRITICAL FIX)
-app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
-
-//  Controllers
 app.MapControllers();
 
 app.Run();
-
-
-
 
 
 
