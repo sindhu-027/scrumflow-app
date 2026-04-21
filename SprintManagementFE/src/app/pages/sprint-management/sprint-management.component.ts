@@ -41,25 +41,49 @@ export class SprintManagementComponent implements OnInit {
   }
 
   // ================= LOAD =================
+  // loadSprints() {
+  //   this.loading = true;
+
+  //   this.auth.getAllSprints().subscribe({
+  //     next: (res: any) => {
+
+  //       this.sprints = (res || []).map((s: any) => ({
+  //         ...s,
+  //         status: s.status || 'Planned'
+  //       }));
+
+  //       this.loading = false;
+  //     },
+  //     error: () => {
+  //       this.errorMsg = 'Failed to load sprints';
+  //       this.loading = false;
+  //     }
+  //   });
+  // }
+
   loadSprints() {
-    this.loading = true;
+  console.log("🔥 loadSprints called");
 
-    this.auth.getAllSprints().subscribe({
-      next: (res: any) => {
+  this.loading = true;
 
-        this.sprints = (res || []).map((s: any) => ({
-          ...s,
-          status: s.status || 'Planned'
-        }));
+  this.auth.getAllSprints().subscribe({
+    next: (res: any) => {
+      console.log("✅ API success", res);
 
-        this.loading = false;
-      },
-      error: () => {
-        this.errorMsg = 'Failed to load sprints';
-        this.loading = false;
-      }
-    });
-  }
+      this.sprints = (res || []).map((s: any) => ({
+        ...s,
+        status: s.status || 'Planned'
+      }));
+
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error("❌ API error", err);  // 🔥 IMPORTANT
+      this.errorMsg = 'Failed to load sprints';
+      this.loading = false;
+    }
+  });
+}
 
   // ================= CREATE =================
   createSprint() {
