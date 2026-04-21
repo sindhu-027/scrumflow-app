@@ -48,13 +48,28 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 
 // ===================== CORS =====================
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("AllowAngular", policy =>
+//     {
+//         policy.WithOrigins(
+//                 "http://localhost:4200",
+//                 "https://scrumflowapp.onrender.com"
+//               )
+//               .AllowAnyHeader()
+//               .AllowAnyMethod()
+//               .AllowCredentials();
+//     });
+// });
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
         policy.WithOrigins(
                 "http://localhost:4200",
-                "https://scrumflowapp.onrender.com"
+                "https://scrumflowapp.onrender.com",
+                "https://www.scrumflowapp.onrender.com"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()
