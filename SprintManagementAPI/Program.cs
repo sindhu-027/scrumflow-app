@@ -5,6 +5,7 @@ using SprintManagementAPI.Data;
 using SprintManagementAPI.Services;
 using SprintManagementAPI.Middlewares;
 using System.Text.Json.Serialization;
+using System.Linq; 
 
 var builder = WebApplication.CreateBuilder(args);
 
