@@ -38,6 +38,17 @@ export class SprintManagementComponent implements OnInit {
     //   next: (res: any) => this.role = res.role,
     //   error: () => alert('Session expired. Please login again.')
     // });
+
+    this.auth.getCurrentUser().subscribe({
+      next: (res: any) => {
+        console.log("USER OK", res);
+        this.role = res.role;
+      },
+      error: (err) => {
+        console.error("USER ERROR", err);
+        this.role = '';
+      }
+    });
   }
 
   // ================= LOAD =================
@@ -98,7 +109,7 @@ export class SprintManagementComponent implements OnInit {
       startDate: this.newSprintStart,
       endDate: this.newSprintEnd,
       description: this.newSprintDescription,
-      status: 'Planned'
+     // status: 'Planned'
     };
 
     this.auth.createSprint(sprint).subscribe({
