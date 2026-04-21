@@ -134,8 +134,16 @@ export class AuthService {
     );
   }
 
-  updateUser(id: number, data: any) {
-  return this.http.put(`${this.apiUrl}/users/${id}`, data);
+//   updateUser(id: number, data: any) {
+//   return this.http.put(`${this.apiUrl}/users/${id}`, data);
+// }
+
+updateUser(id: number, data: any) {
+  return this.http.put(
+    `${this.apiUrl}/users/${id}`,
+    data,
+    { withCredentials: true }   // ✅ ADDED
+  );
 }
 
   // 🔥 START SPRINT (NEW)
