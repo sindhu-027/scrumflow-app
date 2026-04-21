@@ -21,6 +21,8 @@ namespace SprintManagementAPI.Utils
                 // 🔥 MUST for cross-origin (Angular + API)
                 SameSite = SameSiteMode.None,
 
+                Domain = null,
+
                 Expires = DateTime.UtcNow.AddDays(expireDays ?? DefaultCookieExpiryDays)
             };
 
