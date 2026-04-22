@@ -71,29 +71,42 @@ using (var scope = app.Services.CreateScope())
 
 // ===================== MIDDLEWARE =====================
 
-// ✅ MUST FIRST
+// 1️⃣ Routing FIRST
 app.UseRouting();
 
-// ✅ CORS immediately after routing
+// 2️⃣ CORS MUST COME HERE
 app.UseCors("AllowAngular");
 
-// ✅ Handle preflight (VERY IMPORTANT)
-app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
+// 🔥 3️⃣ HANDLE PREFLIGHT (FINAL FIX)
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.Headers["Access-Control-Allow-Origin"] = "https://scrumflowapp.onrender.com";
+        context.Response.Headers["Access-Control-Allow-Credentials"] = "true";
+        context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization";
+        context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
 
-// ✅ HTTPS
+        context.Response.StatusCode = 200;
+        return;
+    }
+
+    await next();
+});
+
+// 4️⃣ HTTPS
 app.UseHttpsRedirection();
 
-// ✅ Custom auth
+// 5️⃣ Custom Auth
 app.UseAuthMiddleware();
 
+// 6️⃣ Authorization
 app.UseAuthorization();
 
-// ✅ Controllers
+// 7️⃣ Controllers
 app.MapControllers();
 
 app.Run();
-
-
 
 
 
