@@ -159,9 +159,46 @@ namespace SprintManagementAPI.Controllers
         }
 
         // POST: api/sprints
+        // [HttpPost("sprints")]
+        // public IActionResult CreateSprint([FromBody] SprintDto dto)
+        // {
+        //     var sprint = new Sprint
+        //     {
+        //         Name = dto.Name,
+        //         StartDate = dto.StartDate,
+        //         EndDate = dto.EndDate,
+        //         Description = dto.Description,
+        //         Status = "Planned"
+        //     };
+
+        //     return Ok(_userService.CreateSprint(sprint));
+        // }
+
+
         [HttpPost("sprints")]
         public IActionResult CreateSprint([FromBody] SprintDto dto)
         {
+            // 🔥 1. Get session
+            var sessionId = CookieUtil.GetCookie(Request, "sessionId");
+
+            if (string.IsNullOrEmpty(sessionId))
+                return Unauthorized(new { message = "No active session" });
+
+            // 🔥 2. Get user
+            var user = _authService.GetCurrentUser(sessionId);
+
+            if (user == null)
+                return Unauthorized(new { message = "Session expired" });
+
+            // 🔥 3. Role check (IMPORTANT)
+            if (!user.Role.Equals("ScrumMaster", StringComparison.OrdinalIgnoreCase))
+                return StatusCode(403, new { message = "Only Scrum Master can create sprint" });
+
+            // 🔥 4. Validate input
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return BadRequest(new { message = "Sprint name is required" });
+
+            // 🔥 5. Create sprint
             var sprint = new Sprint
             {
                 Name = dto.Name,
@@ -171,8 +208,12 @@ namespace SprintManagementAPI.Controllers
                 Status = "Planned"
             };
 
-            return Ok(_userService.CreateSprint(sprint));
+            var result = _userService.CreateSprint(sprint);
+
+            return Ok(result);
         }
+
+
 
         // ✅ FIX: restrict id to int
         // PUT: api/sprints/1
