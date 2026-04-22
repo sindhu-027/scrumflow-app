@@ -106,11 +106,18 @@ export class SprintManagementComponent implements OnInit {
 
     const sprint = {
       name: this.newSprintName,
-      startDate: this.newSprintStart,
-      endDate: this.newSprintEnd,
-      description: this.newSprintDescription,
-     // status: 'Planned'
+      startDate: new Date(this.newSprintStart).toISOString(),  // ✅ FIX
+      endDate: new Date(this.newSprintEnd).toISOString(),      // ✅ FIX
+      description: this.newSprintDescription
     };
+
+    // const sprint = {
+    //   name: this.newSprintName,
+    //   startDate: this.newSprintStart,
+    //   endDate: this.newSprintEnd,
+    //   description: this.newSprintDescription,
+    //  // status: 'Planned'
+    // };
 
     this.auth.createSprint(sprint).subscribe({
       next: () => {

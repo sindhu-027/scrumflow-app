@@ -159,91 +159,31 @@ namespace SprintManagementAPI.Controllers
         }
 
         // POST: api/sprints
-        // [HttpPost("sprints")]
-        // public IActionResult CreateSprint([FromBody] SprintDto dto)
-        // {
-        //     var sprint = new Sprint
-        //     {
-        //         Name = dto.Name,
-        //         StartDate = dto.StartDate,
-        //         EndDate = dto.EndDate,
-        //         Description = dto.Description,
-        //         Status = "Planned"
-        //     };
-
-        //     return Ok(_userService.CreateSprint(sprint));
-        // }
-
-
-        // [HttpPost("sprints")]
-        // public IActionResult CreateSprint([FromBody] SprintDto dto)
-        // {
-        //     // 🔥 1. Get session
-        //     var sessionId = CookieUtil.GetCookie(Request, "sessionId");
-
-        //     if (string.IsNullOrEmpty(sessionId))
-        //         return Unauthorized(new { message = "No active session" });
-
-        //     // 🔥 2. Get user
-        //     var user = _authService.GetCurrentUser(sessionId);
-
-        //     if (user == null)
-        //         return Unauthorized(new { message = "Session expired" });
-
-        //     // 🔥 3. Role check (IMPORTANT)
-        //     if (!user.Role.Equals("ScrumMaster", StringComparison.OrdinalIgnoreCase))
-        //         return StatusCode(403, new { message = "Only Scrum Master can create sprint" });
-
-        //     // 🔥 4. Validate input
-        //     if (string.IsNullOrWhiteSpace(dto.Name))
-        //         return BadRequest(new { message = "Sprint name is required" });
-
-        //     // 🔥 5. Create sprint
-        //     var sprint = new Sprint
-        //     {
-        //         Name = dto.Name,
-        //         StartDate = dto.StartDate,
-        //         EndDate = dto.EndDate,
-        //         Description = dto.Description,
-        //         Status = "Planned"
-        //     };
-
-        //     var result = _userService.CreateSprint(sprint);
-
-        //     return Ok(result);
-        // }
-
-
-
+     
 
         [HttpPost("sprints")]
-public IActionResult CreateSprint([FromBody] SprintDto dto)
-{
-    try
-    {
-        var sprint = new Sprint
+        public IActionResult CreateSprint([FromBody] SprintDto dto)
         {
-            Name = dto.Name,
-            StartDate = dto.StartDate,
-            EndDate = dto.EndDate,
-            Description = dto.Description,
-            Status = "Planned"
-        };
+            if (dto == null)
+                return BadRequest("Invalid data");
 
-        var result = _userService.CreateSprint(sprint);
+            if (string.IsNullOrEmpty(dto.Name))
+                return BadRequest("Name is required");
 
-        return Ok(result);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new
-        {
-            message = ex.Message,
-            inner = ex.InnerException?.Message
-        });
-    }
-}
+            if (dto.StartDate == default || dto.EndDate == default)
+                return BadRequest("Invalid dates");
 
+            var sprint = new Sprint
+            {
+                Name = dto.Name,
+                StartDate = dto.StartDate,
+                EndDate = dto.EndDate,
+                Description = dto.Description,
+                Status = "Planned"
+            };
+
+            return Ok(_userService.CreateSprint(sprint));
+        }
 
 
         // ✅ FIX: restrict id to int

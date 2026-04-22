@@ -62,6 +62,7 @@ builder.Services.AddCors(options =>
 // ===================== BUILD =====================
 var app = builder.Build();
 
+app.UseDeveloperExceptionPage();
 // ===================== AUTO MIGRATION =====================
 using (var scope = app.Services.CreateScope())
 {
